@@ -1,1 +1,118 @@
-<h1>My documentation</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All4P Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        
+        h1 {
+            color: #1f2328;
+            border-bottom: 1px solid #d8dee4;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        
+        .doc-section {
+            background-color: #f6f8fa;
+            border: 1px solid #d8dee4;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .doc-section h2 {
+            margin-top: 0;
+            color: #1f2328;
+            font-size: 1.5em;
+        }
+        
+        .doc-section p {
+            margin-bottom: 15px;
+        }
+        
+        .doc-link {
+            display: inline-block;
+            background-color: #0969da;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        
+        .doc-link:hover {
+            background-color: #0550ae;
+        }
+        
+        .highlight {
+            background-color: #fff8c5;
+            border-left: 4px solid #d1c000;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .meta {
+            color: #656d76;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>All4P Documentation Hub</h1>
+    
+    <div class="highlight">
+        <strong>Welcome to the All4P Documentation Portal</strong><br>
+        This site contains comprehensive technical documentation and guides for various cybersecurity and infrastructure topics.
+    </div>
+    
+    <div class="doc-section">
+        <h2>🔒 Secure Public Network Architecture</h2>
+        <p>
+            Comprehensive guide for designing and implementing secure public network architecture 
+            for self-hosted servers. This documentation covers cybersecurity best practices, 
+            network topology design, security controls, and monitoring strategies.
+        </p>
+        <p><strong>Topics covered:</strong></p>
+        <ul>
+            <li>DMZ architecture and network segmentation</li>
+            <li>Firewall configuration and access control lists</li>
+            <li>VPN setup for secure remote access</li>
+            <li>DDoS protection and intrusion detection</li>
+            <li>Monitoring tools and threat detection</li>
+            <li>Server stack security considerations</li>
+        </ul>
+        <a href="secure-network-architecture.html" class="doc-link">View Security Architecture Guide →</a>
+        <div class="meta">
+            <strong>Status:</strong> Complete | <strong>Level:</strong> Advanced | <strong>Type:</strong> Security Architecture
+        </div>
+    </div>
+    
+    <div class="doc-section">
+        <h2>📋 Additional Documentation</h2>
+        <p>More technical guides and documentation will be added to this portal as they become available.</p>
+        <div class="meta">
+            <strong>Coming Soon:</strong> Additional cybersecurity guides, infrastructure documentation, and best practice resources.
+        </div>
+    </div>
+    
+    <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #d8dee4; color: #656d76; text-align: center;">
+        <p>All4P Documentation Portal | Last Updated: <span id="lastUpdated"></span></p>
+        <script>
+            document.getElementById('lastUpdated').textContent = new Date().toISOString().split('T')[0];
+        </script>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Public Network Architecture for Self-Hosted Servers</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        
+        h1, h2, h3 {
+            color: #1f2328;
+            border-bottom: 1px solid #d8dee4;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            font-size: 1.25em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .toc {
+            background-color: #f6f8fa;
+            border: 1px solid #d8dee4;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .toc ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .toc a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .diagram {
+            background-color: #f6f8fa;
+            border: 1px solid #d8dee4;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', Consolas, monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        
+        .config-example {
+            background-color: #161b22;
+            color: #e6edf3;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+        
+        .config-example code {
+            color: #e6edf3;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 14px;
+        }
+        
+        .warning {
+            background-color: #fff8c5;
+            border: 1px solid #d1c000;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+        }
+        
+        .best-practice {
+            background-color: #dafbe1;
+            border: 1px solid #1f883d;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .best-practice::before {
+            content: "✅ ";
+            font-weight: bold;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #d8dee4;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f6f8fa;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 10px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .navigation a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        
+        .navigation a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <a href="index.html">← Back to Documentation Home</a>
+    </nav>
+
+    <h1>Secure Public Network Architecture for Self-Hosted Servers</h1>
+
+    <div class="toc">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#network-topology">Network Topology Design</a>
+                <ul>
+                    <li><a href="#dmz-architecture">DMZ Architecture</a></li>
+                    <li><a href="#network-segmentation">Network Segmentation</a></li>
+                    <li><a href="#firewall-placement">Firewall Placement</a></li>
+                </ul>
+            </li>
+            <li><a href="#security-controls">Security Controls</a>
+                <ul>
+                    <li><a href="#firewall-rules">Firewall Rules</a></li>
+                    <li><a href="#access-control">Access Control Lists (ACLs)</a></li>
+                    <li><a href="#vpn-configuration">VPN Configuration</a></li>
+                </ul>
+            </li>
+            <li><a href="#ddos-protection">DDoS Protection</a></li>
+            <li><a href="#intrusion-detection">Intrusion Detection & Prevention</a></li>
+            <li><a href="#monitoring">Monitoring & Threat Detection</a></li>
+            <li><a href="#server-stacks">Server Stack Considerations</a></li>
+            <li><a href="#implementation">Implementation Guide</a></li>
+            <li><a href="#best-practices">Best Practices Summary</a></li>
+        </ul>
+    </div>
+
+    <section id="overview">
+        <h2>Overview</h2>
+        <p>This document provides a comprehensive guide for designing and implementing a secure public network architecture suitable for exposing self-hosted servers to the internet. The architecture focuses on cybersecurity best practices while maintaining necessary functionality and performance.</p>
+        
+        <h3>Design Principles</h3>
+        <ul>
+            <li><strong>Defense in Depth:</strong> Multiple layers of security controls</li>
+            <li><strong>Least Privilege:</strong> Minimal access rights for users and services</li>
+            <li><strong>Network Segmentation:</strong> Isolation of critical systems</li>
+            <li><strong>Continuous Monitoring:</strong> Real-time threat detection and response</li>
+            <li><strong>Fail-Safe Defaults:</strong> Deny-by-default security policies</li>
+        </ul>
+    </section>
+
+    <section id="network-topology">
+        <h2>Network Topology Design</h2>
+        
+        <section id="dmz-architecture">
+            <h3>DMZ Architecture</h3>
+            <p>A properly configured DMZ (Demilitarized Zone) is essential for protecting internal networks while providing public services.</p>
+            
+            <div class="diagram">
+Internet
+    │
+    ▼
+┌─────────────────┐
+│   Edge Router   │  ← ISP Connection, Initial Filtering
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│  Edge Firewall  │  ← Primary Security Gateway
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│      DMZ        │  ← Public-Facing Services
+│  ┌───────────┐  │
+│  │Web Server │  │
+│  └───────────┘  │
+│  ┌───────────┐  │
+│  │Mail Server│  │
+│  └───────────┘  │
+│  ┌───────────┐  │
+│  │   Proxy   │  │
+│  └───────────┘  │
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│Internal Firewall│  ← Secondary Security Layer
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│Internal Network │  ← Protected Internal Systems
+│  ┌───────────┐  │
+│  │ Database  │  │
+│  └───────────┘  │
+│  ┌───────────┐  │
+│  │App Server │  │
+│  └───────────┘  │
+│  ┌───────────┐  │
+│  │Management │  │
+│  └───────────┘  │
+└─────────────────┘
+            </div>
+            
+            <div class="best-practice">
+                <strong>Best Practice:</strong> The DMZ should contain only services that must be directly accessible from the internet. All administrative access should go through secure channels (VPN, bastion hosts).
+            </div>
+        </section>
+
+        <section id="network-segmentation">
+            <h3>Network Segmentation</h3>
+            <p>Proper network segmentation limits the blast radius of security incidents and improves overall network security posture.</p>
+            
+            <h4>Recommended Network Segments</h4>
+            <table>
+                <tr>
+                    <th>Segment</th>
+                    <th>Purpose</th>
+                    <th>Access Level</th>
+                    <th>Example Subnets</th>
+                </tr>
+                <tr>
+                    <td>DMZ</td>
+                    <td>Public-facing services</td>
+                    <td>Internet accessible</td>
+                    <td>10.0.1.0/24</td>
+                </tr>
+                <tr>
+                    <td>Internal LAN</td>
+                    <td>Internal applications and databases</td>
+                    <td>DMZ and management only</td>
+                    <td>10.0.10.0/24</td>
+                </tr>
+                <tr>
+                    <td>Management</td>
+                    <td>Administrative systems</td>
+                    <td>VPN and authorized users</td>
+                    <td>10.0.100.0/24</td>
+                </tr>
+                <tr>
+                    <td>Guest/IoT</td>
+                    <td>Untrusted devices</td>
+                    <td>Internet only, isolated</td>
+                    <td>10.0.200.0/24</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="firewall-placement">
+            <h3>Firewall Placement</h3>
+            <p>Strategic firewall placement provides multiple checkpoints for traffic inspection and control.</p>
+            
+            <h4>Multi-Layer Firewall Strategy</h4>
+            <ol>
+                <li><strong>Edge Firewall:</strong> Primary internet-facing security gateway</li>
+                <li><strong>DMZ Firewall:</strong> Controls traffic between DMZ and internal networks</li>
+                <li><strong>Internal Firewalls:</strong> Segment-specific access controls</li>
+                <li><strong>Host-Based Firewalls:</strong> Server-level protection</li>
+            </ol>
+        </section>
+    </section>
+
+    <section id="security-controls">
+        <h2>Security Controls</h2>
+        
+        <section id="firewall-rules">
+            <h3>Firewall Rules</h3>
+            <p>Firewall rules should follow the principle of least privilege, allowing only necessary traffic.</p>
+            
+            <h4>Edge Firewall Rules (iptables example)</h4>
+            <div class="config-example">
+                <code># Default policies - DENY ALL
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+# Allow loopback traffic
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# Allow established and related connections
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow HTTP/HTTPS to DMZ web servers
+iptables -A FORWARD -p tcp --dport 80 -d 10.0.1.0/24 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -p tcp --dport 443 -d 10.0.1.0/24 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Allow SSH from management network only
+iptables -A FORWARD -p tcp --dport 22 -s 10.0.100.0/24 -d 10.0.1.0/24 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Allow DNS queries
+iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+iptables -A OUTPUT -p tcp --dport 53 -j ACCEPT
+
+# Rate limiting for SSH
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set --name SSH
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 --name SSH -j DROP
+
+# Log dropped packets
+iptables -A INPUT -j LOG --log-prefix "DROPPED INPUT: "
+iptables -A FORWARD -j LOG --log-prefix "DROPPED FORWARD: "
+
+# Default DROP rules (explicit)
+iptables -A INPUT -j DROP
+iptables -A FORWARD -j DROP</code>
+            </div>
+            
+            <div class="warning">
+                <strong>Warning:</strong> Always test firewall rules in a non-production environment first. Incorrect rules can lock you out of your server.
+            </div>
+        </section>
+
+        <section id="access-control">
+            <h3>Access Control Lists (ACLs)</h3>
+            <p>ACLs provide granular control over network access and should be implemented at multiple layers.</p>
+            
+            <h4>Network ACL Configuration</h4>
+            <table>
+                <tr>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Protocol/Port</th>
+                    <th>Action</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Internet</td>
+                    <td>DMZ</td>
+                    <td>TCP/80,443</td>
+                    <td>Allow</td>
+                    <td>Web traffic</td>
+                </tr>
+                <tr>
+                    <td>DMZ</td>
+                    <td>Internal DB</td>
+                    <td>TCP/3306,5432</td>
+                    <td>Allow</td>
+                    <td>Database queries</td>
+                </tr>
+                <tr>
+                    <td>Management</td>
+                    <td>All segments</td>
+                    <td>TCP/22</td>
+                    <td>Allow</td>
+                    <td>SSH administration</td>
+                </tr>
+                <tr>
+                    <td>Guest/IoT</td>
+                    <td>Internal</td>
+                    <td>Any</td>
+                    <td>Deny</td>
+                    <td>Network isolation</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="vpn-configuration">
+            <h3>VPN Configuration</h3>
+            <p>VPN provides secure remote access for administrators and authorized users.</p>
+            
+            <h4>OpenVPN Server Configuration</h4>
+            <div class="config-example">
+                <code># OpenVPN server configuration (/etc/openvpn/server.conf)
+port 1194
+proto udp
+dev tun
+
+# Certificates and keys
+ca ca.crt
+cert server.crt
+key server.key
+dh dh2048.pem
+tls-auth ta.key 0
+
+# Network configuration
+server 10.8.0.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+
+# Push routes to client
+push "route 10.0.100.0 255.255.255.0"
+push "route 10.0.10.0 255.255.255.0"
+
+# Security settings
+cipher AES-256-CBC
+auth SHA256
+user nobody
+group nogroup
+persist-key
+persist-tun
+
+# Logging
+status openvpn-status.log
+log-append /var/log/openvpn.log
+verb 3
+
+# Client-specific configurations
+client-config-dir ccd
+
+# Prevent clients from seeing each other
+client-to-client
+
+# Compression
+comp-lzo</code>
+            </div>
+            
+            <h4>Client Certificate Management</h4>
+            <div class="config-example">
+                <code># Generate client certificate
+./easyrsa gen-req client1 nopass
+./easyrsa sign-req client client1
+
+# Revoke client certificate if compromised
+./easyrsa revoke client1
+./easyrsa gen-crl
+
+# Update server with new CRL
+cp pki/crl.pem /etc/openvpn/</code>
+            </div>
+        </section>
+    </section>
+
+    <section id="ddos-protection">
+        <h2>DDoS Protection</h2>
+        <p>DDoS protection requires multiple layers of defense to handle different types of attacks.</p>
+        
+        <h3>Network-Level Protection</h3>
+        <ul>
+            <li><strong>Rate Limiting:</strong> Limit connection rates per IP address</li>
+            <li><strong>SYN Flood Protection:</strong> Configure SYN cookies and connection limits</li>
+            <li><strong>Bandwidth Monitoring:</strong> Monitor for unusual traffic patterns</li>
+            <li><strong>Geo-blocking:</strong> Block traffic from suspicious geographic regions</li>
+        </ul>
+        
+        <h4>iptables Rate Limiting Configuration</h4>
+        <div class="config-example">
+            <code># Limit new connections per IP
+iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m recent --set
+iptables -A INPUT -p tcp --dport 80 -m state --state NEW -m recent --update --seconds 60 --hitcount 20 -j DROP
+
+# Limit ICMP ping requests
+iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s --limit-burst 5 -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+
+# SYN flood protection
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies
+echo 2048 > /proc/sys/net/ipv4/tcp_max_syn_backlog
+echo 3 > /proc/sys/net/ipv4/tcp_synack_retries</code>
+        </div>
+        
+        <h3>Application-Level Protection</h3>
+        <ul>
+            <li><strong>Web Application Firewall (WAF):</strong> Filter malicious HTTP requests</li>
+            <li><strong>Content Delivery Network (CDN):</strong> Distribute traffic load</li>
+            <li><strong>Load Balancing:</strong> Distribute traffic across multiple servers</li>
+            <li><strong>Caching:</strong> Reduce server load with static content caching</li>
+        </ul>
+    </section>
+
+    <section id="intrusion-detection">
+        <h2>Intrusion Detection & Prevention</h2>
+        <p>IDS/IPS systems provide real-time monitoring and automated response to security threats.</p>
+        
+        <h3>Suricata IDS Configuration</h3>
+        <div class="config-example">
+            <code># Suricata configuration (/etc/suricata/suricata.yaml)
+vars:
+  address-groups:
+    HOME_NET: "[10.0.0.0/8,192.168.0.0/16,172.16.0.0/12]"
+    EXTERNAL_NET: "!$HOME_NET"
+    
+  port-groups:
+    HTTP_PORTS: "80"
+    HTTPS_PORTS: "443"
+    SSH_PORTS: "22"
+
+default-log-dir: /var/log/suricata/
+
+outputs:
+  - fast:
+      enabled: yes
+      filename: fast.log
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert
+        - http
+        - dns
+        - tls
+
+app-layer:
+  protocols:
+    http:
+      enabled: yes
+    tls:
+      enabled: yes
+    ssh:
+      enabled: yes
+
+rule-files:
+  - emerging-threats.rules
+  - custom.rules</code>
+        </div>
+        
+        <h3>Custom Detection Rules</h3>
+        <div class="config-example">
+            <code># Custom Suricata rules (/etc/suricata/rules/custom.rules)
+
+# Detect SSH brute force attempts
+alert tcp any any -> $HOME_NET $SSH_PORTS (msg:"SSH Brute Force Attempt"; flow:to_server,established; content:"SSH"; detection_filter:track by_src, count 5, seconds 60; sid:1000001;)
+
+# Detect SQL injection attempts
+alert http any any -> $HOME_NET $HTTP_PORTS (msg:"SQL Injection Attempt"; flow:to_server,established; content:"union select"; nocase; sid:1000002;)
+
+# Detect port scanning
+alert tcp any any -> $HOME_NET any (msg:"Port Scan Detected"; flags:S; detection_filter:track by_src, count 10, seconds 5; sid:1000003;)
+
+# Detect unusual outbound traffic
+alert tcp $HOME_NET any -> !$HOME_NET ![80,443,53,22] (msg:"Suspicious Outbound Connection"; flow:to_server,new; sid:1000004;)</code>
+        </div>
+    </section>
+
+    <section id="monitoring">
+        <h2>Monitoring & Threat Detection</h2>
+        <p>Comprehensive monitoring provides visibility into network security and helps detect threats early.</p>
+        
+        <h3>Essential Monitoring Components</h3>
+        <ul>
+            <li><strong>Network Traffic Analysis:</strong> Monitor bandwidth usage and traffic patterns</li>
+            <li><strong>Log Aggregation:</strong> Centralize logs from all security devices</li>
+            <li><strong>Security Information and Event Management (SIEM):</strong> Correlate security events</li>
+            <li><strong>Vulnerability Scanning:</strong> Regular security assessments</li>
+            <li><strong>Performance Monitoring:</strong> Track system performance and availability</li>
+        </ul>
+        
+        <h3>Recommended Monitoring Tools</h3>
+        <table>
+            <tr>
+                <th>Tool</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+                <th>License</th>
+            </tr>
+            <tr>
+                <td>ELK Stack</td>
+                <td>Log aggregation and analysis</td>
+                <td>Real-time search, visualization, alerting</td>
+                <td>Open Source</td>
+            </tr>
+            <tr>
+                <td>Nagios</td>
+                <td>Infrastructure monitoring</td>
+                <td>Service monitoring, alerting, reporting</td>
+                <td>Open Source/Commercial</td>
+            </tr>
+            <tr>
+                <td>OSSEC</td>
+                <td>Host-based intrusion detection</td>
+                <td>File integrity monitoring, log analysis</td>
+                <td>Open Source</td>
+            </tr>
+            <tr>
+                <td>Nessus</td>
+                <td>Vulnerability scanning</td>
+                <td>Automated scans, compliance reporting</td>
+                <td>Commercial</td>
+            </tr>
+            <tr>
+                <td>Zabbix</td>
+                <td>Network monitoring</td>
+                <td>Real-time monitoring, alerting</td>
+                <td>Open Source</td>
+            </tr>
+        </table>
+        
+        <h3>Log Monitoring with ELK Stack</h3>
+        <div class="config-example">
+            <code># Logstash configuration for firewall logs
+input {
+  file {
+    path => "/var/log/iptables.log"
+    start_position => "beginning"
+    type => "iptables"
+  }
+}
+
+filter {
+  if [type] == "iptables" {
+    grok {
+      match => { "message" => "%{MONTH:month} %{MONTHDAY:day} %{TIME:time} %{HOSTNAME:hostname} kernel: %{GREEDYDATA:iptables_message}" }
+    }
+    
+    if "DROPPED" in [iptables_message] {
+      grok {
+        match => { "iptables_message" => "DROPPED.*SRC=%{IP:src_ip} DST=%{IP:dst_ip}.*PROTO=%{WORD:protocol}.*DPT=%{INT:dst_port}" }
+      }
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "firewall-logs-%{+YYYY.MM.dd}"
+  }
+}</code>
+        </div>
+        
+        <h3>Alerting Strategy</h3>
+        <div class="best-practice">
+            <strong>Best Practice:</strong> Implement tiered alerting based on severity levels:
+            <ul>
+                <li><strong>Critical:</strong> Immediate notification (SMS, phone call)</li>
+                <li><strong>High:</strong> Email notification within 5 minutes</li>
+                <li><strong>Medium:</strong> Email notification within 15 minutes</li>
+                <li><strong>Low:</strong> Daily summary report</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="server-stacks">
+        <h2>Server Stack Considerations</h2>
+        <p>Different server types require specific security considerations while maintaining the overall network architecture.</p>
+        
+        <h3>Web Server Stack</h3>
+        <h4>LAMP/LEMP Stack Security</h4>
+        <ul>
+            <li><strong>Web Server Hardening:</strong> Disable unnecessary modules, configure secure headers</li>
+            <li><strong>Application Security:</strong> Input validation, SQL injection prevention</li>
+            <li><strong>Database Security:</strong> Network isolation, encrypted connections</li>
+            <li><strong>SSL/TLS Configuration:</strong> Strong cipher suites, HSTS, certificate management</li>
+        </ul>
+        
+        <div class="config-example">
+            <code># Nginx security configuration
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    
+    # SSL Configuration
+    ssl_certificate /etc/ssl/certs/example.com.crt;
+    ssl_certificate_key /etc/ssl/private/example.com.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512;
+    ssl_prefer_server_ciphers off;
+    
+    # Security Headers
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options DENY always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+    
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+    limit_req zone=login burst=5 nodelay;
+    
+    # Hide server information
+    server_tokens off;
+}</code>
+        </div>
+        
+        <h3>Application Server Stack</h3>
+        <h4>API Server Security</h4>
+        <ul>
+            <li><strong>Authentication:</strong> Strong authentication mechanisms (OAuth 2.0, JWT)</li>
+            <li><strong>Authorization:</strong> Role-based access control (RBAC)</li>
+            <li><strong>API Rate Limiting:</strong> Prevent abuse and DoS attacks</li>
+            <li><strong>Input Validation:</strong> Sanitize and validate all inputs</li>
+        </ul>
+        
+        <h3>Database Server Stack</h3>
+        <h4>Database Security</h4>
+        <ul>
+            <li><strong>Network Isolation:</strong> Database servers should not be directly accessible from the internet</li>
+            <li><strong>Encryption:</strong> Encrypt data at rest and in transit</li>
+            <li><strong>Access Control:</strong> Implement database-level user permissions</li>
+            <li><strong>Backup Security:</strong> Encrypt and secure database backups</li>
+        </ul>
+        
+        <div class="config-example">
+            <code># MySQL security configuration
+# /etc/mysql/mysql.conf.d/mysqld.cnf
+
+[mysqld]
+# Network security
+bind-address = 10.0.10.5
+port = 3306
+skip-networking = false
+
+# SSL/TLS configuration
+ssl-ca = /etc/mysql/ssl/ca-cert.pem
+ssl-cert = /etc/mysql/ssl/server-cert.pem
+ssl-key = /etc/mysql/ssl/server-key.pem
+require_secure_transport = ON
+
+# Logging
+log-error = /var/log/mysql/error.log
+general_log = ON
+general_log_file = /var/log/mysql/general.log
+slow_query_log = ON
+slow_query_log_file = /var/log/mysql/slow.log
+
+# Security settings
+local-infile = 0
+symbolic-links = 0</code>
+        </div>
+    </section>
+
+    <section id="implementation">
+        <h2>Implementation Guide</h2>
+        <p>Follow this step-by-step guide to implement the secure network architecture.</p>
+        
+        <h3>Phase 1: Network Planning</h3>
+        <ol>
+            <li>Design network topology and IP addressing scheme</li>
+            <li>Plan firewall placement and rules</li>
+            <li>Design network segmentation strategy</li>
+            <li>Document security requirements for each segment</li>
+        </ol>
+        
+        <h3>Phase 2: Infrastructure Setup</h3>
+        <ol>
+            <li>Configure edge router and internet connection</li>
+            <li>Deploy and configure edge firewall</li>
+            <li>Set up DMZ network segment</li>
+            <li>Configure internal firewall and network segments</li>
+            <li>Implement VPN server for secure remote access</li>
+        </ol>
+        
+        <h3>Phase 3: Security Controls</h3>
+        <ol>
+            <li>Implement firewall rules and ACLs</li>
+            <li>Deploy intrusion detection/prevention systems</li>
+            <li>Configure DDoS protection measures</li>
+            <li>Set up logging and monitoring systems</li>
+            <li>Implement host-based security controls</li>
+        </ol>
+        
+        <h3>Phase 4: Server Deployment</h3>
+        <ol>
+            <li>Deploy servers in appropriate network segments</li>
+            <li>Configure server-specific security controls</li>
+            <li>Implement SSL/TLS certificates</li>
+            <li>Set up application-level security measures</li>
+            <li>Configure backup and recovery procedures</li>
+        </ol>
+        
+        <h3>Phase 5: Testing and Validation</h3>
+        <ol>
+            <li>Conduct penetration testing</li>
+            <li>Perform vulnerability assessments</li>
+            <li>Test incident response procedures</li>
+            <li>Validate monitoring and alerting systems</li>
+            <li>Document findings and remediate issues</li>
+        </ol>
+        
+        <div class="warning">
+            <strong>Warning:</strong> Always implement and test security measures in a non-production environment before deploying to production. Have a rollback plan ready for each implementation phase.
+        </div>
+    </section>
+
+    <section id="best-practices">
+        <h2>Best Practices Summary</h2>
+        
+        <h3>Network Security</h3>
+        <div class="best-practice">
+            <ul>
+                <li>Implement defense in depth with multiple security layers</li>
+                <li>Use network segmentation to limit attack surface</li>
+                <li>Apply the principle of least privilege to all access controls</li>
+                <li>Regularly update and patch all network devices</li>
+                <li>Implement strong authentication for all administrative access</li>
+            </ul>
+        </div>
+        
+        <h3>Monitoring and Incident Response</h3>
+        <div class="best-practice">
+            <ul>
+                <li>Establish continuous monitoring for all network segments</li>
+                <li>Implement automated alerting for security events</li>
+                <li>Maintain up-to-date incident response procedures</li>
+                <li>Regularly test backup and recovery procedures</li>
+                <li>Conduct periodic security assessments and penetration testing</li>
+            </ul>
+        </div>
+        
+        <h3>Compliance and Documentation</h3>
+        <div class="best-practice">
+            <ul>
+                <li>Maintain comprehensive documentation of network architecture</li>
+                <li>Document all security controls and configurations</li>
+                <li>Implement change management procedures</li>
+                <li>Regularly review and update security policies</li>
+                <li>Ensure compliance with relevant security standards and regulations</li>
+            </ul>
+        </div>
+        
+        <h3>Regular Maintenance Tasks</h3>
+        <table>
+            <tr>
+                <th>Task</th>
+                <th>Frequency</th>
+                <th>Responsibility</th>
+            </tr>
+            <tr>
+                <td>Security patch management</td>
+                <td>Monthly</td>
+                <td>System Administrator</td>
+            </tr>
+            <tr>
+                <td>Firewall rule review</td>
+                <td>Quarterly</td>
+                <td>Security Team</td>
+            </tr>
+            <tr>
+                <td>Vulnerability assessment</td>
+                <td>Quarterly</td>
+                <td>Security Team</td>
+            </tr>
+            <tr>
+                <td>Penetration testing</td>
+                <td>Annually</td>
+                <td>External Security Firm</td>
+            </tr>
+            <tr>
+                <td>Incident response plan testing</td>
+                <td>Bi-annually</td>
+                <td>All Teams</td>
+            </tr>
+            <tr>
+                <td>Backup testing and validation</td>
+                <td>Monthly</td>
+                <td>System Administrator</td>
+            </tr>
+        </table>
+    </section>
+
+    <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #d8dee4; color: #656d76;">
+        <p><strong>Document Version:</strong> 1.0 | <strong>Last Updated:</strong> <span id="lastUpdated"></span></p>
+        <p><strong>Author:</strong> Security Architecture Team | <strong>Review Status:</strong> Approved</p>
+        <script>
+            document.getElementById('lastUpdated').textContent = new Date().toISOString().split('T')[0];
+        </script>
+    </footer>
+</body>
+</html>
